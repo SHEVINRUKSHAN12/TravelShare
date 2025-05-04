@@ -1,13 +1,37 @@
-body {
+/* Basic Reset */
+* {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Apply scroll snapping to the root scrolling element */
+html {
+  scroll-snap-type: y mandatory; /* Snap vertically, mandatory means always snap */
+  scroll-behavior: smooth; /* Add smooth scrolling effect */
+  height: 100%;
+}
+
+body {
+  font-family: 'Arial', sans-serif; /* Or choose a nicer font */
+  line-height: 1.6;
+  background-color: #f4f4f4; /* Default background for other pages */
+  color: #333;
+  /* Ensure body doesn't interfere with html scroll snapping */
+  height: 100%;
+  overflow: auto; /* Allow body content to scroll if needed, but snapping is on html */
+}
+
+a {
+  color: #333;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+/* Ensure root takes full height */
+#root {
+  height: 100%;
 }
