@@ -1,0 +1,116 @@
+.home-page {
+  width: 100%;
+  /* No fixed height, allow content to determine height */
+}
+
+/* Common styles for sections with video backgrounds */
+.video-section {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* Each video section takes full viewport height */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+}
+
+.bg-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+  z-index: -2;
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust opacity as needed */
+  z-index: -1;
+}
+
+.section-content {
+  z-index: 1;
+  padding: 2rem;
+  max-width: 800px; /* Limit content width for readability */
+}
+
+.section-content h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.section-content h2 {
+  font-size: 2.5rem; /* Slightly smaller for secondary sections */
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.section-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.cta-button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #4a90e2;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #357abd;
+}
+
+/* Styles for non-video sections */
+.plain-section {
+  padding: 4rem 2rem;
+  text-align: center;
+  background-color: #fff; /* Or any other background */
+}
+
+.plain-section h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.plain-section p {
+  font-size: 1.1rem;
+  color: #555;
+  max-width: 700px;
+  margin: 0 auto; /* Center the paragraph */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .section-content h1 {
+    font-size: 2.5rem;
+  }
+  .section-content h2 {
+    font-size: 2rem;
+  }
+  .section-content p {
+    font-size: 1rem;
+  }
+  .video-section {
+    height: auto; /* Adjust height on smaller screens if needed */
+    min-height: 80vh; /* Ensure it's still substantial */
+  }
+}
