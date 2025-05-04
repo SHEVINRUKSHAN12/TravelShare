@@ -1,0 +1,82 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+  padding: 1rem 2rem;
+  position: fixed; /* Or absolute, depending on layout needs */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-sizing: border-box;
+  transition: transform 0.3s ease-in-out; /* Add transition for smooth hide/show */
+}
+
+/* Style for when the navbar is hidden */
+.navbar--hidden {
+  transform: translateY(-100%); /* Move navbar completely off-screen upwards */
+}
+
+/* Style for when the navbar is visible (optional, default state) */
+.navbar--visible {
+  transform: translateY(0);
+}
+
+/* Reverted to simpler logo style */
+.navbar-logo a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.5rem; /* Original size */
+  font-weight: bold;
+  font-family: sans-serif; /* Revert to default sans-serif */
+  letter-spacing: normal; /* Remove letter spacing */
+  text-transform: none; /* Remove uppercase */
+  transition: color 0.3s ease; /* Keep color transition */
+  text-shadow: none; /* Remove text shadow */
+}
+
+.navbar-logo a:hover {
+   color: #6db9ff; /* Keep or adjust hover color */
+   text-shadow: none; /* Ensure no shadow on hover */
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li {
+  margin-left: 1.5rem;
+}
+
+.navbar-links a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.navbar-links a:hover {
+  color: #4a90e2; /* Highlight color on hover */
+}
+
+/* Basic responsiveness */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .navbar-links {
+    margin-top: 1rem;
+    flex-direction: column;
+    width: 100%;
+  }
+  .navbar-links li {
+    margin-left: 0;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+}
