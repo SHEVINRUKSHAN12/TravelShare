@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '../Navbar/nav'; // Import the Navbar
+import Footer from '../Footer/footer'; // Import the Footer
 
 // Define style objects
 const styles = {
@@ -65,28 +66,13 @@ const styles = {
     padding: '1rem 2rem', // Larger padding
     fontSize: '1.1rem', // Slightly larger font size
     color: '#fff',
-    backgroundColor: '#5DADE2', // Slightly different blue shade
+    backgroundColor: '#27ae60', // Match navbar's green gradient theme
     border: 'none',
     borderRadius: '8px', // More rounded corners
     cursor: 'pointer',
     boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)', // Add a subtle shadow to the button
+    transition: 'background-color 0.3s ease',
   },
-  plainSection: {
-    padding: '4rem 2rem',
-    textAlign: 'center',
-    backgroundColor: '#fff', // Or any other background
-  },
-  plainSectionH2: {
-    fontSize: '2rem',
-    marginBottom: '1rem',
-    color: '#333',
-  },
-  plainSectionP: {
-    fontSize: '1.1rem',
-    color: '#555',
-    maxWidth: '700px',
-    margin: '0 auto', // Center the paragraph
-  }
 };
 
 function Home() {
@@ -118,7 +104,7 @@ function Home() {
       </section>
 
       {/* Discover Section (Second Video) */}
-      <section style={styles.videoSection}> {/* Apply videoSection style */}
+      <section style={{ ...styles.videoSection }} className="second-video-section"> {/* Add class */}
         <video autoPlay loop muted playsInline style={styles.bgVideo}> {/* Apply bgVideo style */}
           <source src={video2Path} type="video/mp4" />
           Your browser does not support the video tag.
@@ -130,12 +116,7 @@ function Home() {
         </div>
       </section>
 
-      {/* You can add more non-video sections below */}
-      <section style={styles.plainSection}> {/* Apply plainSection style */}
-         <h2 style={styles.plainSectionH2}>Plan Your Next Trip</h2> {/* Apply plainSectionH2 style */}
-         <p style={styles.plainSectionP}>Use our tools to create itineraries and packing lists.</p> {/* Apply plainSectionP style */}
-      </section>
-
+      <Footer /> {/* Include the Footer */}
     </div>
   );
 }
