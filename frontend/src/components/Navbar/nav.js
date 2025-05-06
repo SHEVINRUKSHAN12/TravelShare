@@ -6,11 +6,11 @@ const styles = {
     position: 'fixed',
     top: 0,
     width: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent background
+    background: 'linear-gradient(to right, #2ecc71, #27ae60, #228b22)', // Green gradient
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '0.5rem 2rem',
+    padding: '0.8rem 2.5rem', // Increased padding to make navbar bigger
     boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
     zIndex: 1000, // Ensure navbar stays on top of other content
   },
@@ -55,7 +55,7 @@ function Navbar() {
   return (
     <nav style={styles.navbar}>
       <Link to="/" style={styles.logo}>
-        TravelPlatform
+        TravelShare
       </Link>
       <div style={styles.navLinks}>
         <Link 
