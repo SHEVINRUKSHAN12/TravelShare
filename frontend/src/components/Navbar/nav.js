@@ -126,13 +126,9 @@ function Navbar() {
         >
           Login
         </button>
-        <button
-          style={styles.button}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = styles.buttonHover.backgroundColor)}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = styles.button.backgroundColor)}
-        >
+        <Link to="/register" style={{ ...styles.button, textDecoration: 'none' }}> {/* Changed to Link */}
           Register
-        </button>
+        </Link>
       </div>
     </nav>
   );
