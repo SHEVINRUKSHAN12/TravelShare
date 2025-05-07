@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react'; // Add useRef
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar/nav'; // Assuming Navbar is in this path
 
@@ -130,6 +130,60 @@ const styles = {
     width: '100%',
     marginBottom: '10px',
   },
+  profilePhotoContainer: {
+    marginBottom: '25px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  photoUploadArea: {
+    position: 'relative',
+    width: '120px',
+    height: '120px',
+    borderRadius: '50%',
+    backgroundColor: '#f0f0f0',
+    border: '2px dashed #27ae60',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    overflow: 'hidden',
+    transition: 'all 0.3s ease',
+  },
+  photoUploadAreaHover: {
+    backgroundColor: '#e8f5e9',
+    borderColor: '#219653',
+  },
+  profilePhotoPreview: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  cameraIcon: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    background: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+    fontSize: '24px',
+    opacity: 0,
+    transition: 'opacity 0.3s ease',
+  },
+  cameraIconVisible: {
+    opacity: 1,
+  },
+  uploadText: {
+    marginTop: '10px',
+    color: '#27ae60',
+    fontSize: '0.9rem',
+    fontWeight: '500',
+  },
+  fileInput: {
+    display: 'none',
+  },
 };
 
 // Material button styles for Google Sign-In
@@ -207,7 +261,11 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    profilePhoto: null, // Add profilePhoto to form data
   });
+  const [photoPreview, setPhotoPreview] = useState(null); // State for photo preview
+  const fileInputRef = useRef(null); // Reference to file input element
+  const [isPhotoHovered, setIsPhotoHovered] = useState(false);
   const navigate = useNavigate();
   
   // Use useCallback to memoize the handler function
@@ -286,15 +344,61 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle profile photo selection
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file type and size
+      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+      
+      if (!validImageTypes.includes(file.type)) {
+        alert("Please upload a valid image (JPEG, PNG, GIF, or WebP)");
+        return;
+      }
+      
+      if (file.size > maxSizeInBytes) {
+        alert("File is too large. Please upload an image smaller than 5MB.");
+        return;
+      }
+      
+      setFormData({
+        ...formData,
+        profilePhoto: file,
+      });
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    console.log('Form data submitted:', formData);
     
-    // Simulate successful registration
+    // Here you would typically send the form data including the profile photo
+    // to your backend using FormData for multipart/form-data
+    console.log('Form data submitted:', formData);
+    console.log('Profile photo:', formData.profilePhoto);
+    
+    // Create FormData object for the backend API call (when implemented)
+    const formDataForApi = new FormData();
+    formDataForApi.append('name', formData.name);
+    formDataForApi.append('username', formData.username);
+    formDataForApi.append('email', formData.email);
+    formDataForApi.append('password', formData.password);
+    if (formData.profilePhoto) {
+      formDataForApi.append('profilePhoto', formData.profilePhoto);
+    }
+    
+    // For now, simulate successful registration
     alert('Registration successful (simulation)!');
     navigate('/');
   };
@@ -346,6 +450,47 @@ const Register = () => {
               <div style={styles.divider}></div>
               <span style={styles.dividerText}>or</span>
               <div style={styles.divider}></div>
+            </div>
+            
+            {/* Improved Profile Photo Upload */}
+            <div style={styles.profilePhotoContainer}>
+              <div 
+                style={{
+                  ...styles.photoUploadArea,
+                  ...(isPhotoHovered ? styles.photoUploadAreaHover : {})
+                }}
+                onClick={() => fileInputRef.current.click()}
+                onMouseEnter={() => setIsPhotoHovered(true)}
+                onMouseLeave={() => setIsPhotoHovered(false)}
+              >
+                {photoPreview ? (
+                  <img 
+                    src={photoPreview}
+                    alt="Profile Preview" 
+                    style={styles.profilePhotoPreview}
+                  />
+                ) : (
+                  <span role="img" aria-label="User Icon" style={{ fontSize: '40px' }}>👤</span>
+                )}
+                <div 
+                  style={{
+                    ...styles.cameraIcon,
+                    ...(isPhotoHovered ? styles.cameraIconVisible : {})
+                  }}
+                >
+                  <span role="img" aria-label="Camera Icon">📷</span>
+                </div>
+              </div>
+              <p style={styles.uploadText}>
+                {photoPreview ? 'Click to change photo' : 'Click to upload profile photo'}
+              </p>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handlePhotoChange}
+                accept="image/jpeg, image/png, image/gif, image/webp"
+                style={styles.fileInput}
+              />
             </div>
             
             {/* Regular registration form */}
