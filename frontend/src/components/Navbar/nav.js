@@ -119,15 +119,19 @@ function Navbar() {
           Travel Diaries
         </Link>
         {/* Add more nav links as needed */}
-        <button
-          style={styles.button}
+        <Link 
+          to="/login" 
+          style={{ ...styles.button, textDecoration: 'none' }}
           onMouseEnter={(e) => (e.target.style.backgroundColor = styles.buttonHover.backgroundColor)}
           onMouseLeave={(e) => (e.target.style.backgroundColor = styles.button.backgroundColor)}
         >
-          Login
-        </button>
-        <Link to="/register" style={{ ...styles.button, textDecoration: 'none' }}> {/* Changed to Link */}
-          Register
+          Sign In
+        </Link>
+        <Link 
+          to="/register" 
+          style={{ ...styles.button, textDecoration: 'none' }}
+        >
+          Sign Up
         </Link>
       </div>
     </nav>
