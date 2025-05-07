@@ -126,24 +126,79 @@ const styles = {
     color: '#757575',
     fontSize: '0.9rem',
   },
-  googleButton: {
+  googleButtonContainer: {
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    padding: '12px 15px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    backgroundColor: '#fff',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    transition: 'background-color 0.3s ease',
-    marginTop: '10px',
+    marginBottom: '10px',
   },
-  googleIcon: {
-    marginRight: '10px',
-    width: '20px',
-    height: '20px',
+};
+
+// Material button styles for Google Sign-In
+const gsiButtonStyles = {
+  button: {
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    MozUserSelect: 'none',
+    msUserSelect: 'none',
+    WebkitAppearance: 'none',
+    backgroundColor: 'white',
+    backgroundImage: 'none',
+    border: '1px solid #747775',
+    borderRadius: '5px',
+    boxSizing: 'border-box',
+    color: '#1f1f1f',
+    cursor: 'pointer',
+    fontFamily: "'Roboto', arial, sans-serif",
+    fontSize: '16px',
+    height: '50px',
+    letterSpacing: '0.25px',
+    outline: 'none',
+    overflow: 'hidden',
+    padding: '0 20px',
+    position: 'relative',
+    textAlign: 'center',
+    transition: 'background-color .218s, border-color .218s, box-shadow .218s',
+    verticalAlign: 'middle',
+    whiteSpace: 'nowrap',
+    width: '100%',
+    maxWidth: '420px',
+    minWidth: 'min-content',
+    marginBottom: '10px',
+  },
+  buttonIcon: {
+    height: '24px',
+    marginRight: '16px',
+    minWidth: '24px',
+    width: '24px',
+  },
+  buttonContentWrapper: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    height: '100%',
+    justifyContent: 'space-between',
+    position: 'relative',
+    width: '100%',
+  },
+  buttonContents: {
+    flexGrow: 1,
+    fontFamily: "'Roboto', arial, sans-serif",
+    fontWeight: 500,
+    fontSize: '16px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    verticalAlign: 'top',
+  },
+  buttonState: {
+    transition: 'opacity .218s',
+    bottom: 0,
+    left: 0,
+    opacity: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   }
 };
 
@@ -155,6 +210,7 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
+  // Implement Google Sign-In callback - this uses useCallback
   const handleGoogleSignIn = useCallback((response) => {
     if (response.credential) {
       const payload = JSON.parse(atob(response.credential.split('.')[1]));
@@ -162,10 +218,11 @@ const Login = () => {
       
       // In a real app, send this token to your backend
       alert(`Signed in with Google as ${payload.name}`);
-      navigate('/');
+      navigate('/'); // Now navigate is being used
     }
   }, [navigate]);
-  
+
+  // Implement Google sign-in script loading - this uses useEffect
   useEffect(() => {
     const loadGoogleScript = () => {
       const script = document.createElement('script');
@@ -180,7 +237,7 @@ const Login = () => {
       if (!window.google) return;
       
       window.google.accounts.id.initialize({
-        client_id: 'YOUR_GOOGLE_CLIENT_ID',
+        client_id: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your actual client ID
         callback: handleGoogleSignIn,
         ux_mode: 'popup',
       });
@@ -199,7 +256,26 @@ const Login = () => {
       }
     };
   }, [handleGoogleSignIn]);
-  
+
+  // Add mouse event handlers for button styling
+  const handleButtonMouseOver = (e) => {
+    e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15)';
+    const stateEl = e.currentTarget.querySelector('.gsi-button-state');
+    if (stateEl) {
+      stateEl.style.backgroundColor = '#303030';
+      stateEl.style.opacity = '8%';
+    }
+  };
+
+  const handleButtonMouseOut = (e) => {
+    e.currentTarget.style.boxShadow = '';
+    const stateEl = e.currentTarget.querySelector('.gsi-button-state');
+    if (stateEl) {
+      stateEl.style.opacity = '0';
+    }
+  };
+
+  // Trigger Google sign-in popup
   const handleCustomGoogleSignIn = () => {
     window.google?.accounts.id.prompt();
   };
@@ -216,7 +292,7 @@ const Login = () => {
     // Add your login logic here
     // For now, simulate a successful login
     alert('Login successful (simulation)!');
-    navigate('/');
+    navigate('/'); // Navigate is used here too
   };
 
   return (
@@ -224,33 +300,42 @@ const Login = () => {
       <Navbar />
       <div style={styles.loginPage}>
         <div style={styles.contentContainer}>
-          {/* Image Section */}
           <div style={styles.imageSection}>
             <img 
-              src="/assets/login-bg.jpg" // You'll need to add this image
+              src="/assets/login-bg.jpg"
               alt="Travel inspiration"
               style={styles.image}
             />
             <div style={styles.imageOverlay}></div>
           </div>
 
-          {/* Form Section */}
           <div style={styles.formSection}>
             <h1 style={styles.title}>Welcome Back</h1>
             
-            {/* Google Sign-In Button */}
-            <button 
-              style={styles.googleButton}
-              onClick={handleCustomGoogleSignIn}
-              type="button"
-            >
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
-                alt="Google logo"
-                style={styles.googleIcon}
-              />
-              Sign in with Google
-            </button>
+            {/* Centered Google Sign-In Button with Material Design */}
+            <div style={styles.googleButtonContainer}>
+              <button 
+                style={gsiButtonStyles.button}
+                onClick={handleCustomGoogleSignIn}
+                onMouseOver={handleButtonMouseOver}
+                onMouseOut={handleButtonMouseOut}
+                type="button"
+              >
+                <div className="gsi-button-state" style={gsiButtonStyles.buttonState}></div>
+                <div style={gsiButtonStyles.buttonContentWrapper}>
+                  <div style={gsiButtonStyles.buttonIcon}>
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" xmlnsXlink="http://www.w3.org/1999/xlink" style={{ display: 'block' }}>
+                      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                      <path fill="none" d="M0 0h48v48H0z"></path>
+                    </svg>
+                  </div>
+                  <span style={gsiButtonStyles.buttonContents}>Sign in with Google</span>
+                </div>
+              </button>
+            </div>
             
             {/* Divider */}
             <div style={styles.dividerContainer}>
@@ -274,6 +359,7 @@ const Login = () => {
                   placeholder="Enter your email"
                 />
               </div>
+              
               <div style={styles.formGroup}>
                 <label htmlFor="password" style={styles.label}>Password</label>
                 <input
