@@ -1,12 +1,12 @@
 import React from 'react';
-import Navbar from '../Navbar/nav';
+import UserNav from '../Navbar/UserNav'; // Changed import from Navbar to UserNav
 
 const styles = {
   dashboardPage: {
     display: 'flex',
     flexDirection: 'column',
     minHeight: '100vh',
-    paddingTop: '80px',
+    paddingTop: '80px', // Adjust if UserNav height is different
     background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
   },
   contentContainer: {
@@ -33,7 +33,7 @@ const styles = {
 const Dashboard = () => {
   return (
     <>
-      <Navbar />
+      <UserNav /> {/* Changed from Navbar to UserNav */}
       <div style={styles.dashboardPage}>
         <div style={styles.contentContainer}>
           <h1 style={styles.title}>Dashboard</h1>

@@ -7,6 +7,7 @@ import CreatePostForm from './components/TravelDiaries/CreatePostForm';
 import Register from './components/Register/Register'; // Import the Register component
 import Login from './components/Login/Login'; // Import the Login component
 import Dashboard from './components/Dashboard/Dashboard'; // Import the Dashboard component
+import UserProfile from './components/UserScreens/UserProfile'; // Import UserProfile
 
 // Import ToastContainer for notifications
 import { ToastContainer } from 'react-toastify';
@@ -36,6 +37,7 @@ function App() {
           <Route path="/register" element={<Register />} /> {/* Add register route */}
           <Route path="/login" element={<Login />} /> {/* Add login route */}
           <Route path="/dashboard" element={<Dashboard />} /> {/* Add dashboard route */}
+          <Route path="/profile" element={<UserProfile />} /> {/* Add profile route */}
         </Routes>
       </div>
     </Router>

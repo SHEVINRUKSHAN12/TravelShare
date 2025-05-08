@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar/nav';
+import { toast } from 'react-toastify'; // Import toast
 
 const styles = {
   loginPage: {
@@ -217,7 +218,7 @@ const Login = () => {
       console.log('Google user info:', payload);
       
       // In a real app, send this token to your backend
-      alert(`Signed in with Google as ${payload.name}`);
+      toast.success(`Signed in with Google as ${payload.name}`); // Use toast here
       navigate('/'); // Now navigate is being used
     }
   }, [navigate]);
@@ -298,14 +299,14 @@ const Login = () => {
 
       if (response.ok) {
         await response.json(); // Just parse the response without storing it
-        alert('Login successful!');
+        toast.success('Login successful!'); // Use toast for success
         navigate('/dashboard'); // Redirect to dashboard
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Login failed!');
+        toast.error(errorData.message || 'Login failed!'); // Use toast for error
       }
     } catch (error) {
-      alert('An error occurred during login!');
+      toast.error('An error occurred during login!'); // Use toast for catch block error
     }
   };
 
