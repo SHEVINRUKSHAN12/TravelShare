@@ -37,8 +37,7 @@ function UserProfile() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Replace with the actual ID of the logged-in user
-    const userId = localStorage.getItem('userId'); // Assuming user ID is stored in localStorage after login/registration
+    const userId = localStorage.getItem('userId'); // Get userId from localStorage
 
     if (!userId) {
       toast.error('No user ID found. Please log in.');
