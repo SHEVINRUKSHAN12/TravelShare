@@ -18,13 +18,12 @@ public class MongoDBConfig {
     
     @Bean
     public CommandLineRunner commandLineRunner() {
-        return _ -> {
+        return (String[] args) -> {
             logger.info("======================================");
             logger.info("MongoDB connection established successfully!");
             logger.info("======================================");
             logger.info("Available collections: {}", mongoTemplate.getCollectionNames());
             logger.info("MongoDB connection established successfully!");
-            
         };
     }
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Navbar from '../Navbar/nav';
+import UserNav from '../Navbar/UserNav'; // Changed import from Navbar to UserNav
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 import { toast } from 'react-toastify'; // Import toast
 
@@ -193,7 +193,7 @@ function CreatePostForm() {
       </video>
       <div style={styles.videoOverlay}></div> {/* Overlay for better readability */}
 
-      <Navbar />
+      <UserNav /> {/* Changed from Navbar to UserNav */}
       <div style={styles.formContainer}>
         <h1 style={styles.header}>Create New Travel Post</h1>
         <form onSubmit={handleSubmit}>

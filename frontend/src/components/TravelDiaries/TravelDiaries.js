@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PostCard from '../PostCard/PostCard';
-import Navbar from '../Navbar/nav';
+import UserNav from '../Navbar/UserNav'; // Changed import from Navbar to UserNav
 import { toast } from 'react-toastify';
 
 // Inline Styles
@@ -116,7 +116,7 @@ function TravelDiaries() {
       </video>
       <div style={styles.videoOverlay}></div>
       
-      <Navbar />
+      <UserNav /> {/* Changed from Navbar to UserNav */}
       <div style={styles.headerContainer}>
         <h1 style={styles.header}>Travel Diaries</h1>
         <Link to="/diaries/new" style={styles.createButton}>

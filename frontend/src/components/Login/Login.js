@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar/nav';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const styles = {
   loginPage: {
@@ -289,15 +291,15 @@ const Login = () => {
     console.log('Login data submitted:', formData);
     console.log('Remember me:', rememberMe);
     
-    // Add your login logic here
-    // For now, simulate a successful login
-    alert('Login successful (simulation)!');
-    navigate('/'); // Navigate is used here too
+    // Simulate a successful login
+    toast.success('Login successful! Redirecting to dashboard...');
+    setTimeout(() => navigate('/dashboard'), 3000); // Redirect to dashboard after 3 seconds
   };
 
   return (
     <>
       <Navbar />
+      <ToastContainer />
       <div style={styles.loginPage}>
         <div style={styles.contentContainer}>
           <div style={styles.imageSection}>

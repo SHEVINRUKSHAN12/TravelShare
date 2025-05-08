@@ -109,15 +109,6 @@ function Navbar() {
         >
           Home
         </Link>
-        <Link 
-          to="/diaries" 
-          style={{
-            ...styles.navLink,
-            ...(isActive('/diaries') ? styles.activeNavLink : {})
-          }}
-        >
-          Travel Diaries
-        </Link>
         {/* Add more nav links as needed */}
         <Link 
           to="/login" 
