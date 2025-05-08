@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'; // Add useRef
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar/nav'; // Assuming Navbar is in this path
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const styles = {
   registerPage: {
@@ -275,7 +277,7 @@ const Register = () => {
       const payload = JSON.parse(atob(response.credential.split('.')[1]));
       console.log('Google user info:', payload);
       
-      alert(`Signed in with Google as ${payload.name}`);
+      toast.success(`Signed in with Google as ${payload.name}`);
       navigate('/'); // Redirect after successful sign-in
     }
   }, [navigate]);
@@ -353,12 +355,12 @@ const Register = () => {
       const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
       
       if (!validImageTypes.includes(file.type)) {
-        alert("Please upload a valid image (JPEG, PNG, GIF, or WebP)");
+        toast.error("Please upload a valid image (JPEG, PNG, GIF, or WebP)");
         return;
       }
       
       if (file.size > maxSizeInBytes) {
-        alert("File is too large. Please upload an image smaller than 5MB.");
+        toast.error("File is too large. Please upload an image smaller than 5MB.");
         return;
       }
       
@@ -379,7 +381,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
     
@@ -398,14 +400,28 @@ const Register = () => {
       formDataForApi.append('profilePhoto', formData.profilePhoto);
     }
     
-    // For now, simulate successful registration
-    alert('Registration successful (simulation)!');
-    navigate('/');
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/register', {
+        method: 'POST',
+        body: formDataForApi,
+      });
+
+      if (response.ok) {
+        toast.success("Registration successful!");
+        setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Registration failed!");
+      }
+    } catch (error) {
+      toast.error("An error occurred during registration!");
+    }
   };
 
   return (
     <>
       <Navbar />
+      <ToastContainer />
       <div style={styles.registerPage}>
         <div style={styles.contentContainer}>
           <div style={styles.imageSection}>
