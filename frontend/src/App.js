@@ -8,6 +8,7 @@ import Register from './components/Register/Register'; // Import the Register co
 import Login from './components/Login/Login'; // Import the Login component
 import Dashboard from './components/Dashboard/Dashboard'; // Import the Dashboard component
 import UserProfile from './components/UserScreens/UserProfile'; // Import UserProfile
+import Settings from './components/UserScreens/Settings'; // Import the Settings component
 
 // Import ToastContainer for notifications
 import { ToastContainer } from 'react-toastify';
@@ -38,6 +39,7 @@ function App() {
           <Route path="/login" element={<Login />} /> {/* Add login route */}
           <Route path="/dashboard" element={<Dashboard />} /> {/* Add dashboard route */}
           <Route path="/profile" element={<UserProfile />} /> {/* Add profile route */}
+          <Route path="/settings" element={<Settings />} /> {/* Correct route for Settings */}
         </Routes>
       </div>
     </Router>
