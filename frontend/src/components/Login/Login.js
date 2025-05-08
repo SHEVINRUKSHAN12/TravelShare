@@ -287,12 +287,26 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Login data submitted:', formData);
-    console.log('Remember me:', rememberMe);
-    
-    // Add your login logic here
-    // For now, simulate a successful login
-    alert('Login successful (simulation)!');
-    navigate('/'); // Navigate is used here too
+    // console.log('Remember me:', rememberMe); // This line was commented out in your log, keeping it so
+
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        await response.json(); // Just parse the response without storing it
+        alert('Login successful!');
+        navigate('/dashboard'); // Redirect to dashboard
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Login failed!');
+      }
+    } catch (error) {
+      alert('An error occurred during login!');
+    }
   };
 
   return (
@@ -302,7 +316,7 @@ const Login = () => {
         <div style={styles.contentContainer}>
           <div style={styles.imageSection}>
             <img 
-              src="/assets/login-bg.jpg"
+              src="/assets/login-bg.jpg"  // Correct path to your image in public folder
               alt="Travel inspiration"
               style={styles.image}
             />

@@ -384,13 +384,7 @@ const Register = () => {
       toast.error("Passwords do not match!");
       return;
     }
-    
-    // Here you would typically send the form data including the profile photo
-    // to your backend using FormData for multipart/form-data
-    console.log('Form data submitted:', formData);
-    console.log('Profile photo:', formData.profilePhoto);
-    
-    // Create FormData object for the backend API call (when implemented)
+
     const formDataForApi = new FormData();
     formDataForApi.append('name', formData.name);
     formDataForApi.append('username', formData.username);
@@ -399,7 +393,7 @@ const Register = () => {
     if (formData.profilePhoto) {
       formDataForApi.append('profilePhoto', formData.profilePhoto);
     }
-    
+
     try {
       const response = await fetch('http://localhost:8080/api/auth/register', {
         method: 'POST',
@@ -407,8 +401,8 @@ const Register = () => {
       });
 
       if (response.ok) {
-        toast.success("Registration successful!");
-        setTimeout(() => navigate('/'), 3000); // Redirect after 3 seconds
+        toast.success("Registration successful! Redirecting to login...");
+        setTimeout(() => navigate('/login'), 3000); // Redirect to login page after 3 seconds
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Registration failed!");
