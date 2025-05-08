@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar/nav';
-import { toast } from 'react-toastify'; // Import toast
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const styles = {
   loginPage: {
@@ -218,7 +219,7 @@ const Login = () => {
       console.log('Google user info:', payload);
       
       // In a real app, send this token to your backend
-      toast.success(`Signed in with Google as ${payload.name}`); // Use toast here
+      alert(`Signed in with Google as ${payload.name}`);
       navigate('/'); // Now navigate is being used
     }
   }, [navigate]);
@@ -288,36 +289,22 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Login data submitted:', formData);
-    // console.log('Remember me:', rememberMe); // This line was commented out in your log, keeping it so
-
-    try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        await response.json(); // Just parse the response without storing it
-        toast.success('Login successful!'); // Use toast for success
-        navigate('/dashboard'); // Redirect to dashboard
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || 'Login failed!'); // Use toast for error
-      }
-    } catch (error) {
-      toast.error('An error occurred during login!'); // Use toast for catch block error
-    }
+    console.log('Remember me:', rememberMe);
+    
+    // Simulate a successful login
+    toast.success('Login successful! Redirecting to dashboard...');
+    setTimeout(() => navigate('/dashboard'), 3000); // Redirect to dashboard after 3 seconds
   };
 
   return (
     <>
       <Navbar />
+      <ToastContainer />
       <div style={styles.loginPage}>
         <div style={styles.contentContainer}>
           <div style={styles.imageSection}>
             <img 
-              src="/assets/login-bg.jpg"  // Correct path to your image in public folder
+              src="/assets/login-bg.jpg"
               alt="Travel inspiration"
               style={styles.image}
             />
