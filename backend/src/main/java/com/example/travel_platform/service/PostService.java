@@ -24,7 +24,7 @@ public class PostService {
 
     private final String uploadDir = "./uploads/posts";
 
-    public Post createPost(String title, String description, String tags, List<MultipartFile> photos, List<MultipartFile> videos) throws IOException {
+    public Post createPost(String title, String description, String tags, List<MultipartFile> photos, List<MultipartFile> videos, String userId) throws IOException {
         List<String> photoPaths = new ArrayList<>();
         List<String> videoPaths = new ArrayList<>();
 
@@ -55,12 +55,63 @@ public class PostService {
         post.setTags(tags != null ? List.of(tags.split(",")) : new ArrayList<>());
         post.setPhotoUrls(photoPaths);
         post.setVideoUrls(videoPaths);
+        post.setUserId(userId); // Set userId
 
         return postRepository.save(post);
     }
 
+    // For backward compatibility
+    public Post createPost(String title, String description, String tags, List<MultipartFile> photos, List<MultipartFile> videos) throws IOException {
+        return createPost(title, description, tags, photos, videos, null);
+    }
+
     public List<Post> getAllPosts() {
         return postRepository.findAll();
+    }
+
+    public List<Post> getPostsByUserId(String userId) {
+        return postRepository.findByUserId(userId); // Ensure this line matches the repository method
+    }
+
+    public Post updatePost(String id, String title, String description, String tags) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found with id: " + id));
+        
+        post.setTitle(title);
+        post.setDescription(description);
+        post.setTags(tags != null ? List.of(tags.split(",")) : post.getTags());
+        
+        return postRepository.save(post);
+    }
+
+    public void deletePost(String id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found with id: " + id));
+        
+        // Delete associated media files if needed
+        // For photos
+        for (String photoUrl : post.getPhotoUrls()) {
+            try {
+                Path photoPath = Paths.get(uploadDir, photoUrl);
+                Files.deleteIfExists(photoPath);
+            } catch (IOException e) {
+                // Log error but continue
+                System.err.println("Error deleting photo: " + e.getMessage());
+            }
+        }
+        
+        // For videos
+        for (String videoUrl : post.getVideoUrls()) {
+            try {
+                Path videoPath = Paths.get(uploadDir, videoUrl);
+                Files.deleteIfExists(videoPath);
+            } catch (IOException e) {
+                // Log error but continue
+                System.err.println("Error deleting video: " + e.getMessage());
+            }
+        }
+        
+        postRepository.deleteById(id);
     }
 
     private String storeFile(MultipartFile file, String subDir) throws IOException {

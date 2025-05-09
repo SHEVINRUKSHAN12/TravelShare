@@ -198,51 +198,48 @@ function CreatePostForm() {
     setVideos(videos.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!title.trim() || !description.trim()) {
-      toast.warn('Title and Description cannot be empty.');
-      return;
-    }
-    if (isSubmitting) return;
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setIsSubmitting(true);
 
-    const formData = new FormData();
-    formData.append('title', title.trim());
-    formData.append('description', description.trim());
-    formData.append('tags', tags); // Backend expects a single string for tags, then splits it
-    
-    // Append photos
-    photos.forEach(photo => formData.append('photos', photo));
-
-    // Append videos
-    videos.forEach(video => formData.append('videos', video));
-    
     try {
-      const response = await fetch('http://localhost:8080/api/posts', {
-        method: 'POST',
-        body: formData, // Browser sets Content-Type to multipart/form-data automatically
-      });
+      const formData = new FormData();
+      formData.append('title', title.trim());
+      formData.append('description', description.trim());
+      formData.append('tags', tags);
 
-      if (!response.ok) {
-        // Try to get more detailed error from backend if possible
-        let errorData;
-        try {
-            errorData = await response.json();
-        } catch (e) {
-            errorData = { message: `HTTP error! status: ${response.status}` };
-        }
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      // Add userId to form data
+      const userId = localStorage.getItem('userId');
+      formData.append('userId', userId);
+      console.log('Creating post with userId:', userId); // Debug log
+
+      // Add photos and videos
+      if (photos.length > 0) {
+        photos.forEach(photo => {
+          formData.append('photos', photo);
+        });
       }
 
-      const createdPost = await response.json();
-      console.log('Post created:', createdPost); // Use the createdPost variable
-      toast.success('Post created successfully!');
-      navigate('/diaries');
+      if (videos.length > 0) {
+        videos.forEach(video => {
+          formData.append('videos', video);
+        });
+      }
+
+      const response = await fetch('http://localhost:8080/api/posts', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        toast.success('Post created successfully!');
+        navigate('/diaries');
+      } else {
+        toast.error('Failed to create post.');
+      }
     } catch (error) {
       console.error('Error creating post:', error);
-      toast.error(`Failed to create post: ${error.message}`);
+      toast.error('An error occurred while creating the post.');
     } finally {
       setIsSubmitting(false);
     }

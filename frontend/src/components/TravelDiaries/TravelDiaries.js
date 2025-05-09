@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import UserNav from '../Navbar/UserNav'; // Changed import from Navbar to UserNav
 import { toast } from 'react-toastify';
 import PostModal from './PostModal'; // Import the modal component for detailed view
+import EditPostForm from './EditPostForm'; // Import the edit post form component
 
 // Inline Styles
 const styles = {
@@ -92,6 +93,27 @@ const styles = {
     fontSize: '0.8rem',
     color: '#007bff',
   },
+  cardActions: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    padding: '10px',
+    borderTop: '1px solid #eee',
+  },
+  actionButton: {
+    padding: '5px 10px',
+    margin: '0 5px',
+    border: 'none',
+    borderRadius: '4px',
+    color: 'white',
+    cursor: 'pointer',
+    fontSize: '0.9rem',
+  },
+  editButton: {
+    backgroundColor: '#3498db',
+  },
+  deleteButton: {
+    backgroundColor: '#e74c3c',
+  },
 };
 
 function TravelDiaries() {
@@ -99,25 +121,38 @@ function TravelDiaries() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null); // State for the selected post
+  const [editingPost, setEditingPost] = useState(null); // State for editing post
+  const [userId, setUserId] = useState(null); // State for user ID
 
   // Path to video file - same as home page and create form
   const videoPath = "/assets/Travel1.mp4";
 
   // Fetch posts when component mounts
   useEffect(() => {
+    const loggedInUserId = localStorage.getItem('userId');
+    console.log('Logged-in userId:', loggedInUserId); // Debugging
+    if (loggedInUserId) {
+      setUserId(loggedInUserId);
+    }
     fetchPosts();
   }, []);
 
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/posts');
+      const loggedInUserId = localStorage.getItem('userId');
+      console.log('Fetching posts for userId:', loggedInUserId);
+      
+      // Change URL to fetch only user's posts
+      const response = await fetch(`http://localhost:8080/api/posts/user/${loggedInUserId}`);
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      console.log('Fetched user posts:', data); // Debugging
 
-      // Use the correct URL for the first photo
+      // Transform posts as before
       const transformedPosts = data.map(post => ({
         ...post,
         imageUrl: post.photoUrls && post.photoUrls.length > 0
@@ -143,6 +178,37 @@ function TravelDiaries() {
     setSelectedPost(null);
   };
 
+  const handleEditPost = (post) => {
+    setEditingPost(post);
+  };
+
+  const handleUpdatePost = (updatedPost) => {
+    setPosts(prevPosts => 
+      prevPosts.map(post => 
+        post.id === updatedPost.id ? updatedPost : post
+      )
+    );
+  };
+
+  const handleDeletePost = async (postId) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/posts/${postId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        toast.success('Post deleted successfully');
+        setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+        setSelectedPost(null);
+      } else {
+        toast.error('Failed to delete post');
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast.error('An error occurred while deleting the post');
+    }
+  };
+
   return (
     <div style={styles.pageContainer}>
       <UserNav />
@@ -155,22 +221,44 @@ function TravelDiaries() {
       <div style={styles.gridContainer}>
         {loading && <p>Loading...</p>}
         {error && <p>{error}</p>}
-        {posts.map(post => (
-          <div 
-            key={post.id} 
-            style={styles.card} 
-            onClick={() => openPostModal(post)}
-          >
-            <img 
-              src={post.imageUrl} 
-              alt={post.title} 
-              style={styles.cardImage} 
-            />
-            <div style={styles.cardContent}>
-              <h2 style={styles.cardTitle}>{post.title}</h2>
-              <p style={styles.cardDescription}>{post.description}</p>
-              <p style={styles.cardTags}>{post.tags.join(', ')}</p>
+        {posts.map((post) => (
+          <div key={post.id} style={styles.card}>
+            <div onClick={() => openPostModal(post)}>
+              <img 
+                src={post.imageUrl} 
+                alt={post.title} 
+                style={styles.cardImage} 
+              />
+              <div style={styles.cardContent}>
+                <h2 style={styles.cardTitle}>{post.title}</h2>
+                <p style={styles.cardDescription}>{post.description}</p>
+                <p style={styles.cardTags}>{post.tags.join(', ')}</p>
+              </div>
             </div>
+            {post.userId === userId && (
+              <div style={styles.cardActions}>
+                <button
+                  style={{ ...styles.actionButton, ...styles.editButton }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditPost(post);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  style={{ ...styles.actionButton, ...styles.deleteButton }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm('Are you sure you want to delete this post?')) {
+                      handleDeletePost(post.id);
+                    }
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -178,10 +266,20 @@ function TravelDiaries() {
         <PostModal 
           post={selectedPost} 
           onClose={closePostModal} 
+          onEdit={handleEditPost}
+          onDelete={handleDeletePost}
+          userId={userId}
+        />
+      )}
+      {editingPost && (
+        <EditPostForm 
+          post={editingPost} 
+          onClose={() => setEditingPost(null)} 
+          onUpdate={handleUpdatePost} 
         />
       )}
     </div>
   );
-} // <-- This closing brace was missing
+}
 
 export default TravelDiaries;

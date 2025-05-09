@@ -1,6 +1,7 @@
 package com.example.travel_platform.model;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -13,14 +14,11 @@ public class Post {
     private String id;
     private String title;
     private String description;
-    private List<String> tags;
-    private List<String> photoUrls;
-    private List<String> videoUrls;
-    private LocalDateTime createdAt;
-
-    public Post() {
-        this.createdAt = LocalDateTime.now();
-    }
+    private List<String> tags = new ArrayList<>();
+    private List<String> photoUrls = new ArrayList<>();
+    private List<String> videoUrls = new ArrayList<>();
+    private String userId;  // Field to store the owner's ID
+    private Date createdAt = new Date();
 
     // Getters and Setters
     public String getId() {
@@ -71,11 +69,19 @@ public class Post {
         this.videoUrls = videoUrls;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 }

@@ -8,10 +8,29 @@ import { format } from 'date-fns';
 
 const styles = {
   dashboardContainer: {
-    display: 'flex',
+    position: 'relative', // Ensure proper layering for the video
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
     paddingTop: '80px',
+    overflow: 'hidden', // Prevent scrolling due to video overflow
+  },
+  bgVideo: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    zIndex: -1, // Place the video behind other content
+    filter: 'blur(8px)', // Add blur effect
+  },
+  videoOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Darker overlay for readability
+    zIndex: -1,
   },
   sidebar: {
     position: 'fixed',
@@ -89,6 +108,8 @@ const styles = {
     marginRight: '10px',
   },
   mainContent: {
+    position: 'relative', // Ensure content is above the video
+    zIndex: 1,
     flex: 1,
     padding: '20px',
     marginLeft: '250px',
@@ -98,9 +119,13 @@ const styles = {
   },
   welcomeMessage: {
     fontSize: '1.5rem',
-    color: '#555',
+    color: '#fff', // Changed to white
     textAlign: 'center',
     marginBottom: '20px',
+  },
+  userName: {
+    color: '#7bed9f', // Light green for the user's name
+    fontWeight: 'bold',
   },
   contentBox: {
     width: '90%',
@@ -129,24 +154,26 @@ const styles = {
 const postStyles = {
   postContainer: {
     width: '100%',
-    maxWidth: '700px', 
-    borderRadius: '8px',
-    backgroundColor: '#ffffff',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-    marginBottom: '20px',
+    maxWidth: '600px', // Increased max width for larger cards
+    borderRadius: '12px', // Slightly larger border radius
+    backgroundColor: 'rgb(37, 39, 40)', // Updated background color
+    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)', // Slightly stronger shadow
+    marginBottom: '25px', // Increased margin for better spacing
+    overflow: 'hidden',
+    border: '1px solid rgb(37, 39, 40)', // Retained border color
   },
   postHeader: {
     display: 'flex',
     alignItems: 'center',
-    padding: '12px',
-    borderBottom: '1px solid #f0f2f5',
+    padding: '10px',
+    borderBottom: '1px solid #555', // Inside border for header
   },
   userAvatar: {
     width: '40px',
     height: '40px',
     borderRadius: '50%',
     marginRight: '10px',
-    backgroundColor: '#27ae60', 
+    backgroundColor: '#27ae60',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -155,71 +182,110 @@ const postStyles = {
   },
   postUserInfo: {
     flex: 1,
+    color: '#fff', // Updated text color to white
   },
   postUserName: {
     fontWeight: 'bold',
-    fontSize: '15px',
+    fontSize: '14px',
     marginBottom: '2px',
+    color: '#fff', // Updated text color to white
   },
   postTime: {
     fontSize: '12px',
-    color: '#65676b',
+    color: '#fff', // Updated text color to white
   },
   postContent: {
-    padding: '12px',
-  },
-  postTitle: {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    marginBottom: '8px',
-  },
-  postText: {
-    fontSize: '15px',
-    marginBottom: '12px',
-    color: '#333',
-  },
-  postImage: {
-    width: '100%',
-    maxHeight: '400px',
-    objectFit: 'cover',
-    borderRadius: '0 0 8px 8px',
-    cursor: 'pointer',
+    padding: '10px',
+    color: '#fff', // Updated text color to white
+    borderTop: '1px solid #555', // Inside border for content
   },
   postActions: {
     display: 'flex',
-    borderTop: '1px solid #f0f2f5',
-    padding: '8px',
+    justifyContent: 'space-around',
+    padding: '10px',
+    borderTop: '1px solid #555', // Inside border for actions
   },
   postAction: {
-    flex: 1,
     display: 'flex',
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: '8px',
     cursor: 'pointer',
-    borderRadius: '4px',
-    color: '#65676b',
+    color: '#fff', // Updated icon and text color to white
     fontSize: '14px',
   },
   postActionIcon: {
     marginRight: '6px',
+    color: '#fff', // Updated icon color to white
   },
-  postTags: {
+  mediaContainer: {
+    position: 'relative',
+    width: '100%',
+    maxHeight: '500px',
+    overflow: 'hidden',
+  },
+  mediaImage: {
+    width: '100%',
+    height: 'auto', 
+    maxHeight: '500px',
+    objectFit: 'cover',
+    display: 'block',
+  },
+  mediaVideo: {
+    width: '100%',
+    height: 'auto',
+    maxHeight: '500px',
+    objectFit: 'cover',
+    display: 'block',
+  },
+  navButton: {
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '50%',
+    width: '30px',
+    height: '30px',
+    fontSize: '16px',
     display: 'flex',
-    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    zIndex: 10,
+    opacity: 0,
+    transition: 'opacity 0.2s ease',
+  },
+  navButtonLeft: {
+    left: '10px',
+  },
+  navButtonRight: {
+    right: '10px',
+  },
+  dotsContainer: {
+    position: 'absolute',
+    bottom: '10px',
+    left: '0',
+    right: '0',
+    display: 'flex',
+    justifyContent: 'center',
     gap: '5px',
-    marginTop: '8px',
-    marginBottom: '12px',
   },
-  tag: {
-    backgroundColor: '#e9f5fe',
-    color: '#1877f2',
-    padding: '4px 8px',
-    borderRadius: '16px',
-    fontSize: '13px',
+  dot: {
+    width: '6px',
+    height: '6px',
+    borderRadius: '50%',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    transition: 'all 0.3s ease',
+    cursor: 'pointer',
   },
-  commentSection: {
-    marginTop: '8px',
+  activeDot: {
+    backgroundColor: '#fff',
+    transform: 'scale(1.2)',
+  },
+  mediaContainerHover: {
+    '&:hover .navButton': {
+      opacity: 1,
+    }
   }
 };
 
@@ -390,6 +456,169 @@ const Dashboard = () => {
     window.location.href = '/travelshare/login';
   };
 
+  const PostCard = ({ post }) => {
+    const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+    const [isHovering, setIsHovering] = useState(false);
+    const mediaItems = [...(post.photoUrls || []), ...(post.videoUrls || [])].filter(Boolean);
+
+    const handleNext = (e) => {
+      e.stopPropagation();
+      setCurrentMediaIndex((prevIndex) => (prevIndex + 1) % mediaItems.length);
+    };
+
+    const handlePrev = (e) => {
+      e.stopPropagation();
+      setCurrentMediaIndex((prevIndex) => (prevIndex - 1 + mediaItems.length) % mediaItems.length);
+    };
+
+    const goToMedia = (index) => (e) => {
+      e.stopPropagation();
+      setCurrentMediaIndex(index);
+    };
+
+    return (
+      <div style={postStyles.postContainer}>
+        <div style={postStyles.postHeader}>
+          <div style={postStyles.userAvatar}>
+            {getInitials(user.name)}
+          </div>
+          <div style={postStyles.postUserInfo}>
+            <p style={postStyles.postUserName}>{user.name || 'Travel Enthusiast'}</p>
+            <p style={postStyles.postTime}>{formatDate(post.createdAt)}</p>
+          </div>
+        </div>
+        
+        {mediaItems.length > 0 && (
+          <div 
+            style={postStyles.mediaContainer}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+          >
+            {mediaItems[currentMediaIndex].endsWith('.mp4') ? (
+              <video
+                src={`http://localhost:8080/uploads/posts/${mediaItems[currentMediaIndex]}`}
+                controls
+                style={postStyles.mediaVideo}
+              />
+            ) : (
+              <img
+                src={`http://localhost:8080/uploads/posts/${mediaItems[currentMediaIndex]}`}
+                alt={`Uploaded content ${currentMediaIndex + 1}`}
+                style={postStyles.mediaImage}
+              />
+            )}
+            
+            {mediaItems.length > 1 && (
+              <>
+                <button
+                  style={{
+                    ...postStyles.navButton,
+                    ...postStyles.navButtonLeft,
+                    opacity: isHovering ? 0.8 : 0,
+                  }}
+                  onClick={handlePrev}
+                >
+                  &#8249;
+                </button>
+                <button
+                  style={{
+                    ...postStyles.navButton, 
+                    ...postStyles.navButtonRight,
+                    opacity: isHovering ? 0.8 : 0,
+                  }}
+                  onClick={handleNext}
+                >
+                  &#8250;
+                </button>
+                <div style={postStyles.dotsContainer}>
+                  {mediaItems.map((_, index) => (
+                    <div
+                      key={index}
+                      onClick={goToMedia(index)}
+                      style={{
+                        ...postStyles.dot,
+                        ...(index === currentMediaIndex ? postStyles.activeDot : {}),
+                      }}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        <div style={postStyles.postContent}>
+          <h3 style={postStyles.postTitle}>{post.title}</h3>
+          <p style={postStyles.postText}>{post.description}</p>
+          {post.tags && post.tags.length > 0 && (
+            <div style={postStyles.postTags}>
+              {post.tags.map((tag, index) => (
+                <span key={index} style={postStyles.tag}>#{tag}</span>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        <div style={postStyles.postActions}>
+          <div
+            style={{
+              ...postStyles.postAction,
+              color: likedPosts[post.id] ? 'red' : '#fff',
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleLike(post.id);
+            }}
+          >
+            <FaHeart style={postStyles.postActionIcon} />
+            Like
+          </div>
+          <div
+            style={postStyles.postAction}
+            onClick={(e) => {
+              e.stopPropagation();
+              openCommentModal(post);
+            }}
+          >
+            <FaComment style={postStyles.postActionIcon} />
+            Comment ({commentCount[post.id] || 0})
+          </div>
+          <div style={postStyles.postAction}>
+            <FaShare style={postStyles.postActionIcon} />
+            Share
+          </div>
+        </div>
+        
+        {post.comments && post.comments.length > 0 && (
+          <div style={{...postStyles.commentSection, maxHeight: '100px', overflowY: 'hidden'}}>
+            {post.comments.slice(0, 2).map((comment, index) => (
+              <div key={index} style={{
+                padding: '8px',
+                borderRadius: '8px',
+                backgroundColor: '#f0f2f5',
+                marginBottom: '8px',
+                fontSize: '14px'
+              }}>
+                <span style={{fontWeight: 'bold'}}>User: </span>
+                {comment}
+              </div>
+            ))}
+            {post.comments.length > 2 && (
+              <div style={{
+                cursor: 'pointer',
+                color: '#65676b',
+                fontSize: '14px',
+                padding: '4px'
+              }} onClick={() => openCommentModal(post)}>
+                View all {post.comments.length} comments
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (!user) {
     return (
       <div style={styles.dashboardContainer}>
@@ -405,6 +634,13 @@ const Dashboard = () => {
     <>
       <UserNav />
       <div style={styles.dashboardContainer}>
+        {/* Background Video */}
+        <video autoPlay loop muted playsInline style={styles.bgVideo}>
+          <source src="/assets/Travel1.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div style={styles.videoOverlay}></div> {/* Overlay for better readability */}
+
         <div style={sidebarOpen ? styles.sidebar : { ...styles.sidebar, ...styles.sidebarCollapsed }}>
           <div
             style={styles.toggleIcon}
@@ -487,7 +723,7 @@ const Dashboard = () => {
         </div>
 
         <div style={{...styles.mainContent, marginLeft: sidebarOpen ? '250px' : '60px'}}>
-          <p style={styles.welcomeMessage}>Hello, <span style={{ color: '#27ae60', fontWeight: 'bold' }}>{user.name}</span>! We're glad to have you here.</p>
+          <p style={styles.welcomeMessage}>Hello, <span style={styles.userName}>{user.name}</span>! We're glad to have you here.</p>
           
           {loading ? (
             <div>Loading posts...</div>
@@ -496,90 +732,7 @@ const Dashboard = () => {
           ) : (
             <div style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
               {posts.map((post) => (
-                <div key={post.id} style={postStyles.postContainer}>
-                  <div style={postStyles.postHeader}>
-                    <div style={postStyles.userAvatar}>
-                      {getInitials(user.name)}
-                    </div>
-                    <div style={postStyles.postUserInfo}>
-                      <p style={postStyles.postUserName}>{user.name || 'Travel Enthusiast'}</p>
-                      <p style={postStyles.postTime}>{formatDate(post.createdAt)}</p>
-                    </div>
-                  </div>
-                  
-                  <div style={postStyles.postContent}>
-                    <h3 style={postStyles.postTitle}>{post.title}</h3>
-                    <p style={postStyles.postText}>{post.description}</p>
-                    
-                    {post.tags && post.tags.length > 0 && (
-                      <div style={postStyles.postTags}>
-                        {post.tags.map((tag, index) => (
-                          <span key={index} style={postStyles.tag}>#{tag}</span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  
-                  {post.imageUrl && (
-                    <img 
-                      src={post.imageUrl} 
-                      alt={post.title} 
-                      style={postStyles.postImage}
-                      onClick={() => openPostModal(post)} 
-                    />
-                  )}
-                  
-                  <div style={postStyles.postActions}>
-                    <div
-                      style={{
-                        ...postStyles.postAction,
-                        color: likedPosts[post.id] ? 'red' : '#65676b',
-                      }}
-                      onClick={() => toggleLike(post.id)}
-                    >
-                      <FaHeart style={postStyles.postActionIcon} />
-                      Like
-                    </div>
-                    <div 
-                      style={postStyles.postAction}
-                      onClick={() => openCommentModal(post)}
-                    >
-                      <FaComment style={postStyles.postActionIcon} />
-                      Comment ({commentCount[post.id] || 0})
-                    </div>
-                    <div style={postStyles.postAction}>
-                      <FaShare style={postStyles.postActionIcon} />
-                      Share
-                    </div>
-                  </div>
-
-                  {post.comments && post.comments.length > 0 && (
-                    <div style={{...postStyles.commentSection, maxHeight: '100px', overflowY: 'hidden'}}>
-                      {post.comments.slice(0, 2).map((comment, index) => (
-                        <div key={index} style={{
-                          padding: '8px',
-                          borderRadius: '8px',
-                          backgroundColor: '#f0f2f5',
-                          marginBottom: '8px',
-                          fontSize: '14px'
-                        }}>
-                          <span style={{fontWeight: 'bold'}}>User: </span>
-                          {comment}
-                        </div>
-                      ))}
-                      {post.comments.length > 2 && (
-                        <div style={{
-                          cursor: 'pointer',
-                          color: '#65676b',
-                          fontSize: '14px',
-                          padding: '4px'
-                        }} onClick={() => openCommentModal(post)}>
-                          View all {post.comments.length} comments
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <PostCard key={post.id} post={post} />
               ))}
             </div>
           )}
