@@ -357,9 +357,9 @@ const Dashboard = () => {
             ...post,
             imageUrl: post.photoUrls && post.photoUrls.length > 0
               ? `http://localhost:8080/uploads/posts/${post.photoUrls[0]}`
-              : null
+              : '/assets/placeholder-image.png',
           }));
-          
+
           setPosts(transformedPosts);
         } else {
           console.error('Failed to fetch posts');
@@ -475,7 +475,7 @@ const Dashboard = () => {
               </a>
             </li>
           </ul>
-          
+
           {sidebarOpen && (
             <button 
               style={styles.logoutButton} 

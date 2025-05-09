@@ -24,7 +24,6 @@ public class PostService {
 
     private final String uploadDir = "./uploads/posts";
 
-    // Corrected createPost method
     public Post createPost(String title, String description, String tags, List<MultipartFile> photos, List<MultipartFile> videos) throws IOException {
         List<String> photoPaths = new ArrayList<>();
         List<String> videoPaths = new ArrayList<>();
@@ -33,7 +32,9 @@ public class PostService {
         if (photos != null) {
             for (MultipartFile photo : photos) {
                 String photoPath = storeFile(photo, "photos");
-                photoPaths.add(photoPath);
+                if (photoPath != null) {
+                    photoPaths.add(photoPath);
+                }
             }
         }
 
@@ -41,7 +42,9 @@ public class PostService {
         if (videos != null) {
             for (MultipartFile video : videos) {
                 String videoPath = storeFile(video, "videos");
-                videoPaths.add(videoPath);
+                if (videoPath != null) {
+                    videoPaths.add(videoPath);
+                }
             }
         }
 
@@ -56,7 +59,6 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    // Corrected getAllPosts method
     public List<Post> getAllPosts() {
         return postRepository.findAll();
     }
@@ -88,11 +90,8 @@ public class PostService {
         Path filePath = uploadPath.resolve(uniqueFilename);
 
         Files.copy(file.getInputStream(), filePath);
-        
-        // Log the file path for debugging
         System.out.println("File saved to: " + filePath.toAbsolutePath());
-        System.out.println("Returning path: " + Paths.get(subDir, uniqueFilename).toString());
-        
+
         return Paths.get(subDir, uniqueFilename).toString();
     }
 }
