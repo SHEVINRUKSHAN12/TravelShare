@@ -21,7 +21,7 @@ function App() {
         {/* Add ToastContainer for notifications */}
         <ToastContainer
           position="top-right"
-          autoClose={3000}
+          autoClose={5000} // Updated autoClose duration
           hideProgressBar={false}
           newestOnTop
           closeOnClick
@@ -34,7 +34,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/diaries" element={<TravelDiaries />} />
-          <Route path="/diaries/new" element={<CreatePostForm />} />
+          <Route path="/create" element={<CreatePostForm />} /> {/* Updated route for CreatePostForm */}
           <Route path="/register" element={<Register />} /> {/* Add register route */}
           <Route path="/login" element={<Login />} /> {/* Add login route */}
           <Route path="/dashboard" element={<Dashboard />} /> {/* Add dashboard route */}
