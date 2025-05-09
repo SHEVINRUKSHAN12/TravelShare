@@ -288,12 +288,26 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login data submitted:', formData);
-    console.log('Remember me:', rememberMe);
-    
-    // Simulate a successful login
-    toast.success('Login successful! Redirecting to dashboard...');
-    setTimeout(() => navigate('/dashboard'), 3000); // Redirect to dashboard after 3 seconds
+
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('userId', data.userId); // Store userId in localStorage
+        toast.success('Login successful! Redirecting to dashboard...');
+        setTimeout(() => navigate('/dashboard'), 3000);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Login failed!');
+      }
+    } catch (error) {
+      toast.error('An error occurred during login!');
+    }
   };
 
   return (

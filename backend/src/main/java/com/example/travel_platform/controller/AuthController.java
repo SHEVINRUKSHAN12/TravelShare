@@ -46,15 +46,20 @@ public class AuthController {
             @RequestParam("password") String password,
             @RequestParam(value = "profilePhoto", required = false) MultipartFile profilePhoto) {
         try {
+            logger.info("Registering user: name={}, username={}, email={}", name, username, email);
             User registeredUser = authService.registerUser(name, username, email, password, profilePhoto);
+            logger.info("User registered successfully: userId={}", registeredUser.getId());
+
             Map<String, Object> response = new HashMap<>();
             response.put("message", "User registered successfully!");
             response.put("userId", registeredUser.getId());
             response.put("username", registeredUser.getUsername());
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
+            logger.warn("Validation error during registration: {}", e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (IOException e) {
+            logger.error("File upload error during registration: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to upload profile picture: " + e.getMessage()));
         }
     }
@@ -64,12 +69,12 @@ public class AuthController {
         try {
             String email = loginData.get("email");
             String password = loginData.get("password");
-            
-            logger.info("Logging in user with email: {}", email);
+
             Optional<User> user = userRepository.findByEmail(email);
 
             if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
                 logger.info("Login successful for user: {}", email);
+
                 Map<String, Object> response = new HashMap<>();
                 response.put("message", "Login successful!");
                 response.put("userId", user.get().getId());
@@ -80,7 +85,7 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid email or password"));
             }
         } catch (Exception e) {
-            logger.error("Unexpected error during login: {}", e.getMessage(), e);
+            logger.error("Unexpected error during login: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An error occurred: " + e.getMessage()));
         }
     }

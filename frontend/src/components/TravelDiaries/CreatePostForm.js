@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Added useEffect import
 import UserNav from '../Navbar/UserNav'; // Changed import from Navbar to UserNav
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 import { toast } from 'react-toastify'; // Import toast
@@ -19,6 +19,7 @@ const styles = {
     top: 0,
     left: 0,
     width: '100%',
+    width: '100%',
     height: '100%',
     objectFit: 'cover',
     zIndex: -2,
@@ -28,7 +29,6 @@ const styles = {
     top: 0,
     left: 0,
     width: '100%',
-    height: '100%',
     backgroundColor: 'rgba(0, 0, 0, 0.6)', // Darker overlay for readability
     zIndex: -1,
   },
@@ -37,10 +37,11 @@ const styles = {
     padding: '2.5rem',
     borderRadius: '8px',
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)', // Stronger shadow
     maxWidth: '700px',
     width: '90%',
     marginTop: '2rem',
-    zIndex: 1, // Ensure it's above the video
+    zIndex: 10, // Higher z-index to ensure visibility
   },
   header: {
     textAlign: 'center',
@@ -108,10 +109,44 @@ const styles = {
     borderRadius: '4px',
     fontSize: '1.1rem',
     fontWeight: 'bold',
-    cursor: 'pointer',
     marginTop: '1.5rem',
     transition: 'background-color 0.2s',
-  }
+  },
+  filePreviewContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '10px',
+    marginTop: '10px',
+  },
+  filePreview: {
+    position: 'relative',
+    width: '100px',
+    height: '100px',
+    borderRadius: '5px',
+    overflow: 'hidden',
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+  },
+  filePreviewImage: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  removeButton: {
+    position: 'absolute',
+    top: '5px',
+    right: '5px',
+    backgroundColor: '#e74c3c',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '50%',
+    width: '20px',
+    height: '20px',
+    cursor: 'pointer',
+    fontSize: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 };
 
 function CreatePostForm() {
@@ -126,61 +161,87 @@ function CreatePostForm() {
   // Path to video file
   const videoPath = "/assets/Travel1.mp4"; // Same path as used in the home page
 
+  // Add an effect to check if component mounts properly
+  useEffect(() => {
+    console.log("CreatePostForm mounted");
+    document.body.style.backgroundColor = "#f0f0f0"; // Fallback background
+    
+    // Cleanup function
+    return () => {
+      document.body.style.backgroundColor = "";
+    };
+  }, []);
+
   const handlePhotoChange = (event) => {
-    setPhotos(event.target.files);
+    const files = Array.from(event.target.files);
+    const validFiles = files.filter(file => file.size <= 10 * 1024 * 1024); // Max 10MB per photo
+    if (validFiles.length !== files.length) {
+      toast.warn('Some files were too large and were not added.');
+    }
+    setPhotos([...photos, ...validFiles]);
   };
 
   const handleVideoChange = (event) => {
-    setVideos(event.target.files);
+    const files = Array.from(event.target.files);
+    const validFiles = files.filter(file => file.size <= 50 * 1024 * 1024); // Max 50MB per video
+    if (validFiles.length !== files.length) {
+      toast.warn('Some files were too large and were not added.');
+    }
+    setVideos([...videos, ...validFiles]);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!title.trim() || !description.trim()) {
-      toast.warn('Title and Description cannot be empty.'); // Use toast for validation error
-      return;
-    }
-    if (isSubmitting) return; // Prevent double submission
+  const removePhoto = (index) => {
+    setPhotos(photos.filter((_, i) => i !== index));
+  };
 
-    setIsSubmitting(true); // Disable button
+  const removeVideo = (index) => {
+    setVideos(videos.filter((_, i) => i !== index));
+  };
 
-    const uploadedPhotoUrls = []; // Replace with actual URLs after upload
-    const uploadedVideoUrls = []; // Replace with actual URLs after upload
-
-    const postData = {
-      title: title.trim(),
-      description: description.trim(),
-      tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
-      photoUrls: uploadedPhotoUrls,
-      videoUrls: uploadedVideoUrls,
-      authorId: 'temp-user-id', // Placeholder
-      authorName: 'Temporary User' // Placeholder
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/posts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData),
-      });
+      const formData = new FormData();
+      formData.append('title', title.trim());
+      formData.append('description', description.trim());
+      formData.append('tags', tags);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      // Add userId to form data
+      const userId = localStorage.getItem('userId');
+      formData.append('userId', userId);
+      console.log('Creating post with userId:', userId); // Debug log
+
+      // Add photos and videos
+      if (photos.length > 0) {
+        photos.forEach(photo => {
+          formData.append('photos', photo);
+        });
       }
 
-      const createdPost = await response.json();
-      console.log('Post created successfully:', createdPost);
-      toast.success('Post created successfully!'); // Use toast for success message
-      navigate('/diaries');
+      if (videos.length > 0) {
+        videos.forEach(video => {
+          formData.append('videos', video);
+        });
+      }
 
+      const response = await fetch('http://localhost:8080/api/posts', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        toast.success('Post created successfully!');
+        navigate('/diaries');
+      } else {
+        toast.error('Failed to create post.');
+      }
     } catch (error) {
       console.error('Error creating post:', error);
-      toast.error(`Failed to create post: ${error.message}`); // Use toast for submission error
+      toast.error('An error occurred while creating the post.');
     } finally {
-      setIsSubmitting(false); // Re-enable button
+      setIsSubmitting(false);
     }
   };
 
@@ -245,14 +306,29 @@ function CreatePostForm() {
               type="file"
               id="photo-upload"
               multiple
-              accept="image/jpeg, image/png"
+              accept="image/jpeg, image/png, image/gif, image/webp" // Added more image types
               onChange={handlePhotoChange}
               style={styles.fileInputHidden}
             />
-            {photos.length > 0 && (
-              <span style={styles.fileInfo}>{photos.length} photo(s) selected</span>
-            )}
-            <p style={styles.fileInfo}>Max 10MB per photo. Supported: .jpg, .png</p>
+            <div style={styles.filePreviewContainer}>
+              {photos.map((photo, index) => (
+                <div key={index} style={styles.filePreview}>
+                  <img
+                    src={URL.createObjectURL(photo)}
+                    alt="Preview"
+                    style={styles.filePreviewImage}
+                  />
+                  <button
+                    type="button"
+                    style={styles.removeButton}
+                    onClick={() => removePhoto(index)}
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+            </div>
+            <p style={styles.fileInfo}>Max 10MB per photo. Supported: .jpg, .png, .gif, .webp</p>
           </div>
 
           {/* Video Upload */}
@@ -265,14 +341,29 @@ function CreatePostForm() {
               type="file"
               id="video-upload"
               multiple
-              accept="video/mp4"
+              accept="video/mp4, video/webm, video/ogg" // Added more video types
               onChange={handleVideoChange}
               style={styles.fileInputHidden}
             />
-            {videos.length > 0 && (
-              <span style={styles.fileInfo}>{videos.length} video(s) selected</span>
-            )}
-            <p style={styles.fileInfo}>Max 50MB per video. Supported: .mp4</p>
+            <div style={styles.filePreviewContainer}>
+              {videos.map((video, index) => (
+                <div key={index} style={styles.filePreview}>
+                  <video
+                    src={URL.createObjectURL(video)}
+                    style={styles.filePreviewImage}
+                    controls
+                  />
+                  <button
+                    type="button"
+                    style={styles.removeButton}
+                    onClick={() => removeVideo(index)}
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+            </div>
+            <p style={styles.fileInfo}>Max 50MB per video. Supported: .mp4, .webm, .ogg</p>
           </div>
 
           {/* Submit Button */}
@@ -283,6 +374,7 @@ function CreatePostForm() {
               backgroundColor: isSubmitting ? '#0056b3' : '#007bff',
             }} 
             disabled={isSubmitting}
+
           >
             {isSubmitting ? 'Creating...' : 'Create Post'}
           </button>
