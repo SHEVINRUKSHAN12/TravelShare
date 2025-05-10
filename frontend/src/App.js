@@ -16,6 +16,15 @@ import GuideDetail from './components/DestinationGuides/GuideDetail';
 import GuideDashboard from './components/DestinationGuides/GuideDashboard';
 import GuideCreate from './components/DestinationGuides/GuideCreate';
 
+// Import Itinerary components
+import TripPlanningDashboard from './components/itinenary/TripPlanningDashboard';
+import CreateItinerary from './components/itinenary/CreateItinerary';
+import ShareItinerary from './components/itinenary/ShareItinerary';
+import SharedItineraries from './components/itinenary/SharedItineraries';
+import PackingList from './components/itinenary/PackingList';
+import ItineraryHome from './components/itinenary/ItineraryHome';
+import ItinerarySharing from './components/itinenary/ItinerarySharing';
+
 // Import ToastContainer for notifications
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -51,6 +60,17 @@ function App() {
           <Route path="/guides/create" element={<GuideCreate />} />
           <Route path="/guides/:id" element={<GuideDetail />} />
           <Route path="/guides/:id/dashboard" element={<GuideDashboard />} />
+
+          {/* Itinerary/Trip Planning Routes */}
+          <Route path="/planning" element={<TripPlanningDashboard />} />
+          <Route path="/itinerary" element={<ItineraryHome />} />
+          <Route path="/itinerary/create" element={<CreateItinerary />} />
+          <Route path="/itinerary/:id" element={<ItineraryHome />} /> {/* For viewing specific itinerary */}
+          <Route path="/itinerary/:id/share" element={<ShareItinerary />} />
+          <Route path="/shared-itineraries" element={<SharedItineraries />} />
+          <Route path="/shared-itinerary/:id" element={<ItineraryHome />} /> {/* For viewing shared itinerary */}
+          <Route path="/packing-lists" element={<PackingList />} />
+          <Route path="/itinerary-sharing" element={<ItinerarySharing />} />
         </Routes>
       </div>
     </Router>
