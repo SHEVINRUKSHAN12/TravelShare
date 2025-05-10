@@ -692,7 +692,12 @@ const Dashboard = () => {
               toggleLike(post.id);
             }}
           >
-            <FaHeart style={postStyles.postActionIcon} />
+            <FaHeart
+              style={{
+                ...postStyles.postActionIcon,
+                color: likedPosts[post.id] ? 'red' : '#fff', // Ensure heart icon color changes
+              }}
+            />
             Like
           </div>
           <div
