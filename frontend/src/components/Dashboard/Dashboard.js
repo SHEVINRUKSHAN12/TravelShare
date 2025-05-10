@@ -690,7 +690,7 @@ const Dashboard = () => {
             </li>
             <li>
               <a
-                href="/travelshare/guides"
+                href="/travelshare/guides" // Changed from "/travelshare/guides/1/dashboard" to "/travelshare/guides"
                 style={sidebarOpen ? styles.navLink : { ...styles.navLink, ...styles.navLinkCollapsed }}
                 title="Destination Guides"
                 onMouseEnter={(e) => (e.target.style.backgroundColor = styles.navLinkHover.backgroundColor)}
