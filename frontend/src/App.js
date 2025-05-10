@@ -25,6 +25,12 @@ import PackingList from './components/itinenary/PackingList';
 import ItineraryHome from './components/itinenary/ItineraryHome';
 import ItinerarySharing from './components/itinenary/ItinerarySharing';
 
+// Import Event Management components
+import EventDashboard from './components/events/EventDashboard';
+import EventDetails from './components/events/EventDetails';
+import CreateEvent from './components/events/CreateEvent';
+import EditEvent from './components/events/EditEvent';
+
 // Import ToastContainer for notifications
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -71,6 +77,12 @@ function App() {
           <Route path="/shared-itinerary/:id" element={<ItineraryHome />} /> {/* For viewing shared itinerary */}
           <Route path="/packing-lists" element={<PackingList />} />
           <Route path="/itinerary-sharing" element={<ItinerarySharing />} />
+
+          {/* Event Management Routes */}
+          <Route path="/events" element={<EventDashboard />} />
+          <Route path="/events/create" element={<CreateEvent />} />
+          <Route path="/events/:id" element={<EventDetails />} />
+          <Route path="/events/edit/:id" element={<EditEvent />} />
         </Routes>
       </div>
     </Router>
