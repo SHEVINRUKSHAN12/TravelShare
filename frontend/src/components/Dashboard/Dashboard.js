@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import UserNav from '../Navbar/UserNav'; 
 import { toast } from 'react-toastify';
-import { FaBars, FaArrowLeft, FaComment, FaHeart, FaShare } from 'react-icons/fa';
+import { FaBars, FaArrowLeft, FaComment, FaHeart, FaShare, FaSearch, FaTimes } from 'react-icons/fa';
 import PostModal from '../TravelDiaries/PostModal';
 import CommentModal from './CommentModal';
 import { format } from 'date-fns';
@@ -148,7 +148,84 @@ const styles = {
     width: '100%',
     textAlign: 'center',
     marginBottom: '20px',
-  }
+  },
+  searchContainer: {
+    width: '80%',
+    maxWidth: '800px',
+    marginBottom: '30px',
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  searchInput: {
+    width: '100%',
+    padding: '12px 45px 12px 15px',
+    borderRadius: '30px',
+    border: '2px solid #27ae60',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    fontSize: '16px',
+    outline: 'none',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 3px 10px rgba(0, 0, 0, 0.1)',
+  },
+  searchInputFocus: {
+    boxShadow: '0 5px 15px rgba(39, 174, 96, 0.3)',
+    border: '2px solid #2ecc71',
+  },
+  searchButton: {
+    position: 'absolute',
+    right: '5px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    fontSize: '20px',
+    color: '#27ae60',
+    cursor: 'pointer',
+    padding: '10px',
+    borderRadius: '50%',
+    transition: 'all 0.2s ease',
+    height: '40px',
+    width: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchButtonHover: {
+    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+  },
+  clearButton: {
+    position: 'absolute',
+    right: '50px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    fontSize: '18px',
+    color: '#555',
+    cursor: 'pointer',
+    padding: '10px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchResults: {
+    textAlign: 'center',
+    fontSize: '18px',
+    color: '#fff',
+    padding: '10px 0',
+    marginBottom: '20px',
+  },
+  noResults: {
+    textAlign: 'center',
+    fontSize: '18px',
+    color: '#fff',
+    padding: '15px',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: '10px',
+    marginBottom: '20px',
+  },
 };
 
 const postStyles = {
@@ -298,6 +375,10 @@ const Dashboard = () => {
   const [likedPosts, setLikedPosts] = useState({});
   const [selectedPostForComment, setSelectedPostForComment] = useState(null);
   const [commentCount, setCommentCount] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
 
   const toggleLike = (postId) => {
     setLikedPosts(prevLikedPosts => ({
@@ -389,6 +470,47 @@ const Dashboard = () => {
     } catch (e) {
       return dateString;
     }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    
+    if (!searchTerm.trim()) {
+      setIsSearching(false);
+      setSearchResults([]);
+      return;
+    }
+    
+    const term = searchTerm.toLowerCase();
+    const filtered = posts.filter(post => 
+      (post.title && post.title.toLowerCase().includes(term)) ||
+      (post.description && post.description.toLowerCase().includes(term)) ||
+      (post.location && post.location.toLowerCase().includes(term)) ||
+      (post.tags && post.tags.some(tag => tag.toLowerCase().includes(term)))
+    );
+    
+    setSearchResults(filtered);
+    setIsSearching(true);
+    
+    if (filtered.length === 0) {
+      toast.info(`No results found for "${searchTerm}"`);
+    } else {
+      toast.success(`Found ${filtered.length} results for "${searchTerm}"`);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    setSearchTerm(e.target.value);
+    if (!e.target.value) {
+      setIsSearching(false);
+      setSearchResults([]);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
+    setIsSearching(false);
+    setSearchResults([]);
   };
 
   useEffect(() => {
@@ -570,7 +692,12 @@ const Dashboard = () => {
               toggleLike(post.id);
             }}
           >
-            <FaHeart style={postStyles.postActionIcon} />
+            <FaHeart
+              style={{
+                ...postStyles.postActionIcon,
+                color: likedPosts[post.id] ? 'red' : '#fff', // Ensure heart icon color changes
+              }}
+            />
             Like
           </div>
           <div
@@ -690,7 +817,7 @@ const Dashboard = () => {
             </li>
             <li>
               <a
-                href="/travelshare/guides"
+                href="/travelshare/guides" // Changed from "/travelshare/guides/1/dashboard" to "/travelshare/guides"
                 style={sidebarOpen ? styles.navLink : { ...styles.navLink, ...styles.navLinkCollapsed }}
                 title="Destination Guides"
                 onMouseEnter={(e) => (e.target.style.backgroundColor = styles.navLinkHover.backgroundColor)}
@@ -725,8 +852,81 @@ const Dashboard = () => {
         <div style={{...styles.mainContent, marginLeft: sidebarOpen ? '250px' : '60px'}}>
           <p style={styles.welcomeMessage}>Hello, <span style={styles.userName}>{user.name}</span>! We're glad to have you here.</p>
           
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} style={styles.searchContainer}>
+            <input
+              type="text"
+              placeholder="Search for destinations, posts, tags..."
+              value={searchTerm}
+              onChange={handleSearchInputChange}
+              style={{
+                ...styles.searchInput,
+                ...(isSearchInputFocused ? styles.searchInputFocus : {})
+              }}
+              onFocus={() => setIsSearchInputFocused(true)}
+              onBlur={() => setIsSearchInputFocused(false)}
+            />
+            {searchTerm && (
+              <button 
+                type="button" 
+                onClick={clearSearch}
+                style={styles.clearButton}
+                title="Clear search"
+              >
+                <FaTimes />
+              </button>
+            )}
+            <button 
+              type="submit" 
+              style={styles.searchButton}
+              title="Search"
+              onMouseEnter={(e) => Object.assign(e.target.style, styles.searchButtonHover)}
+              onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
+            >
+              <FaSearch />
+            </button>
+          </form>
+          
+          {isSearching && (
+            <div style={styles.searchResults}>
+              {searchResults.length > 0 ? (
+                <p>Showing {searchResults.length} results for "{searchTerm}"</p>
+              ) : (
+                <div style={styles.noResults}>
+                  <p>No results found for "{searchTerm}"</p>
+                  <p style={{fontSize: '14px', marginTop: '5px'}}>Try different keywords or check your spelling</p>
+                </div>
+              )}
+            </div>
+          )}
+          
           {loading ? (
             <div>Loading posts...</div>
+          ) : isSearching ? (
+            searchResults.length === 0 ? (
+              <div style={{width: '100%', textAlign: 'center'}}>
+                <button 
+                  onClick={clearSearch}
+                  style={{
+                    padding: '10px 20px',
+                    background: '#27ae60',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '16px'
+                  }}
+                >
+                  Show all posts
+                </button>
+              </div>
+            ) : (
+              <div style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                {searchResults.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              </div>
+            )
           ) : posts.length === 0 ? (
             <div>No posts yet. Be the first to share your travel story!</div>
           ) : (

@@ -10,7 +10,46 @@ const styles = {
     flexDirection: 'column',
     minHeight: '100vh',
     paddingTop: '80px',
-    background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+    position: 'relative', // Ensure proper layering
+    overflow: 'hidden', // Prevent scrollbars from video
+  },
+  fullPageBgVideo: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    zIndex: -2, // Place the video behind everything
+    filter: 'blur(8px)', // Add blur effect
+  },
+  fullPageVideoOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Darker overlay for readability
+    zIndex: -1,
+  },
+  bgVideo: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    zIndex: -1, // Place the video behind other content
+    filter: 'blur(8px)', // Add blur effect
+  },
+  videoOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Darker overlay for readability
+    zIndex: -1,
   },
   contentContainer: {
     display: 'flex',
@@ -40,7 +79,7 @@ const styles = {
     height: '100%',
     backgroundColor: 'rgba(39, 174, 96, 0.2)',
   },
-  image: {
+  video: {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
@@ -315,13 +354,26 @@ const Login = () => {
       <Navbar />
       <ToastContainer />
       <div style={styles.loginPage}>
+        {/* Full-Page Background Video */}
+        <video autoPlay loop muted playsInline style={styles.fullPageBgVideo}>
+          <source src="/assets/Travel2.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div style={styles.fullPageVideoOverlay}></div> {/* Overlay for better readability */}
+
         <div style={styles.contentContainer}>
           <div style={styles.imageSection}>
-            <img 
-              src="/assets/login-bg.jpg"
-              alt="Travel inspiration"
-              style={styles.image}
-            />
+            {/* Left-Side Video */}
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline 
+              style={styles.video}
+            >
+              <source src="/assets/Travel2.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
             <div style={styles.imageOverlay}></div>
           </div>
 
